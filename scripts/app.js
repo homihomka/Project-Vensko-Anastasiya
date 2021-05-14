@@ -62,7 +62,7 @@ function generateMovies(cardsCount) {
         const releaseDate = generateDate(new Date(2000, 1, 1), new Date());
         const boxOffice = generateRandomNumber(0, 100000000);
         const boxOfficeFormatted = new Intl.NumberFormat('ru-RU').format(boxOffice).replaceAll(' ', ',');
-        const rating = generateRandomNumber(4, 10, false).toFixed(1);
+        const rating = generateRandomNumber(4, 9, false).toFixed(1);
 
         return {
             title: titles[cardIndex],
@@ -77,3 +77,32 @@ function generateMovies(cardsCount) {
 }
 
 const data = generateMovies(titles.length);
+
+function render(movies) {
+    const moviesContainer = document.querySelector('.film-list');
+    const cardTemplate = document.getElementById('card-template').content;
+
+    const cards = movies.map(function(movie) {
+        const card = cardTemplate.cloneNode(true);
+        const title = card.querySelector('.card-header__title');
+        const plot = card.querySelector('.film-info__plot .film-info__text');
+        const poster = card.querySelector('.card-header__image');
+        const releaseDate = card.querySelector('.film-info__release-date .film-info__text');
+        const director = card.querySelector('.film-info__director .film-info__text');
+        const boxOffice = card.querySelector('.film-info__box-office .film-info__text');
+        const rating = card.querySelector('.film-info__rating .film-info__text');
+        title.innerText = movie.title;
+        plot.innerText = `${movie.plot.substring(0, 140)}...`;
+        poster.setAttribute('src', movie.poster);
+        releaseDate.innerText = movie.releaseDate;
+        director.innerText = movie.director;
+        boxOffice.innerText = movie.boxOffice;
+        rating.innerText = movie.rating;
+
+        return card;
+    });
+
+    moviesContainer.append(...cards)
+}
+
+render(data);
