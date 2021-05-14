@@ -92,12 +92,12 @@ function render(movies) {
         const boxOffice = card.querySelector('.film-info__box-office .film-info__text');
         const rating = card.querySelector('.film-info__rating .film-info__text');
         title.innerText = movie.title;
-        plot.innerText = `${movie.plot.substring(0, 140)}...`;
+        plot.innerText = `${movie.plot.substring(0, 140)}...` || '-';
         poster.setAttribute('src', movie.poster);
-        releaseDate.innerText = movie.releaseDate;
-        director.innerText = movie.director;
-        boxOffice.innerText = movie.boxOffice;
-        rating.innerText = movie.rating;
+        releaseDate.innerText = movie.releaseDate || '-';
+        director.innerText = movie.director || '-';
+        boxOffice.innerText = movie.boxOffice || '0';
+        rating.innerText = movie.rating || '0';
 
         return card;
     });
