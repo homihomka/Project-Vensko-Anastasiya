@@ -48,7 +48,7 @@ function generateMovies(cardsCount) {
     const movies = new Array(cardsCount).fill(null);
     const generatedIndexes = [];
 
-    return movies.map(function() {
+    return movies.map(function(movie, index) {
         let cardIndex = generateRandomNumber(0, titles.length - 1);
 
         while (generatedIndexes.includes(cardIndex)) {
@@ -62,6 +62,7 @@ function generateMovies(cardsCount) {
         const rating = generateRandomNumber(4, 9, false).toFixed(1);
 
         return {
+            id: index,
             title: titles[cardIndex],
             plot: plots[cardIndex],
             poster: posters[cardIndex],
@@ -75,45 +76,60 @@ function generateMovies(cardsCount) {
 
 const data = generateMovies(titles.length);
 
-function render(movies) {
-    const moviesContainer = document.querySelector('.film-list');
+const favoriteMovies = [];
+
+const moviesContainer = document.querySelector('.film-list');
+
+let isFavoriteChecked = false;
+
+function render(data) {
     moviesContainer.innerHTML = '';
-
     const cardTemplate = document.getElementById('card-template').content;
-
-    const cards = movies.map(function(movie) {
-        const card = cardTemplate.cloneNode(true);
-        const title = card.querySelector('.card-header__title');
-        const plot = card.querySelector('.film-info__plot .film-info__text');
-        const poster = card.querySelector('.card-header__image');
-        const releaseDate = card.querySelector('.film-info__release-date .film-info__text');
-        const director = card.querySelector('.film-info__director .film-info__text');
-        const boxOffice = card.querySelector('.film-info__box-office .film-info__text');
-        const rating = card.querySelector('.film-info__rating .film-info__text');
-
-        const boxOfficeFormatted = (
-            movie.boxOffice &&
-            new Intl.NumberFormat('ru-RU').format(movie.boxOffice).replaceAll(' ', ',')
-        );
-
-        const formattedDate = (
-            movie.releaseDate &&
-            new Intl.DateTimeFormat('ru-RU').format(movie.releaseDate).replaceAll('.', '-')
-        );
-
-
-        title.innerText = movie.title;
-        plot.innerText = `${movie.plot.substring(0, 140)}...` || '-';
-        poster.setAttribute('src', movie.poster);
-        releaseDate.innerText = formattedDate || '-';
-        director.innerText = movie.director || '-';
-        boxOffice.innerText = `$${boxOfficeFormatted}` || '0';
-        rating.innerText = movie.rating || '0';
-
-        return card;
-    });
+    const movies = data.filter(movie => (isFavoriteChecked ?
+        favoriteMovies.includes(movie.id) :
+        !favoriteMovies.includes(movie.id))
+    );
+    const cards = movies.map(movie => getMovieCard(cardTemplate, movie));
 
     moviesContainer.append(...cards)
+}
+
+function getMovieCard(cardTemplate, movie) {
+    const isFavorite = favoriteMovies.includes(movie.id);
+
+    const card = cardTemplate.cloneNode(true).firstElementChild;
+    const title = card.querySelector('.card-header__title');
+    const plot = card.querySelector('.film-info__plot .film-info__text');
+    const poster = card.querySelector('.card-header__image');
+    const releaseDate = card.querySelector('.film-info__release-date .film-info__text');
+    const director = card.querySelector('.film-info__director .film-info__text');
+    const boxOffice = card.querySelector('.film-info__box-office .film-info__text');
+    const rating = card.querySelector('.film-info__rating .film-info__text');
+
+    const favoriteBtn = card.querySelector('.card__footer .card__button');
+    const favoriteBtnClass = isFavorite ? 'button_remove' : 'button_add';
+    favoriteBtn.classList.add(favoriteBtnClass);
+
+    const boxOfficeFormatted = (
+        movie.boxOffice &&
+        new Intl.NumberFormat('ru-RU').format(movie.boxOffice).replaceAll(' ', ',')
+    );
+
+    const formattedDate = (
+        movie.releaseDate &&
+        new Intl.DateTimeFormat('ru-RU').format(movie.releaseDate).replaceAll('.', '-')
+    );
+
+    card.dataset.id = movie.id;
+    title.innerText = movie.title;
+    plot.innerText = `${movie.plot.substring(0, 140)}...` || '-';
+    poster.setAttribute('src', movie.poster);
+    releaseDate.innerText = formattedDate || '-';
+    director.innerText = movie.director || '-';
+    boxOffice.innerText = `$${boxOfficeFormatted}` || '0';
+    rating.innerText = movie.rating || '0';
+
+    return card;
 }
 
 render(data);
@@ -133,16 +149,21 @@ sortingContainer.addEventListener('click', function(event) {
         sortMovies(sortingParameter)
     }
 });
-
 function sortMovies(sortingParameter) {
     const sortedMovies = [...data].sort((a,b) => b[sortingParameter] - a[sortingParameter]);
+
     render(sortedMovies)
 }
-
 function resetSorting () {
     const buttons = sortingContainer.querySelectorAll('.button');
     buttons.forEach((button) => button.classList.remove('button_checked'));
 }
+
+function resetSearch() {
+    const searchField = document.querySelector('.search__input');
+    searchField.value = '';
+}
+
 const searchField = document.querySelector('.search__input');
 searchField.addEventListener('input', function (event) {
     resetSorting();
@@ -150,3 +171,32 @@ searchField.addEventListener('input', function (event) {
     const searchResult = data.filter(movie => movie.title.toLowerCase().includes(searchString));
     render(searchResult);
 });
+
+moviesContainer.addEventListener('click', function (event) {
+    const favoriteButton = event.target.closest('.card__footer .card__button');
+    if (!favoriteButton) return;
+    const card = favoriteButton.closest('.card');
+    const movieId = Number(card.dataset.id);
+
+    if (favoriteButton.classList.contains('button_remove')) {
+        favoriteButton.classList.remove('button_remove');
+        favoriteButton.classList.add('button_add');
+        const favoriteMovieIndex = favoriteMovies.indexOf(movieId);
+        favoriteMovies.splice(favoriteMovieIndex, 1)
+    } else {
+        favoriteButton.classList.remove('button_add');
+        favoriteButton.classList.add('button_remove');
+        favoriteMovies.push(movieId);
+    }
+
+    render(data)
+});
+
+const favoriteFilter = document.querySelector('.filter__check');
+favoriteFilter.addEventListener('change', function(event) {
+    resetSorting();
+    resetSearch();
+    isFavoriteChecked = event.target.checked;
+    render(data)
+});
+
