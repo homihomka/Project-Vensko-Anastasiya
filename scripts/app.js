@@ -127,8 +127,7 @@ sortingContainer.addEventListener('click', function(event) {
         sortingButton.classList.remove('button_checked');
         render(data);
     } else {
-        const buttons = sortingContainer.querySelectorAll('.button');
-        buttons.forEach((button) => button.classList.remove('button_checked'));
+        resetSorting();
         sortingButton.classList.add('button_checked');
         const sortingParameter = sortingButton.id;
         sortMovies(sortingParameter)
@@ -140,8 +139,13 @@ function sortMovies(sortingParameter) {
     render(sortedMovies)
 }
 
+function resetSorting () {
+    const buttons = sortingContainer.querySelectorAll('.button');
+    buttons.forEach((button) => button.classList.remove('button_checked'));
+}
 const searchField = document.querySelector('.search__input');
 searchField.addEventListener('input', function (event) {
+    resetSorting();
     const searchString = event.target.value.toLowerCase();
     const searchResult = data.filter(movie => movie.title.toLowerCase().includes(searchString));
     render(searchResult);
