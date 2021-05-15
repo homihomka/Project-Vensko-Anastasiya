@@ -41,9 +41,7 @@ function generateRandomNumber(min, max, isRounded = true) {
 }
 
 function generateDate(start, end) {
-    const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
-    const formattedDate = new Intl.DateTimeFormat('ru-RU').format(date).replaceAll('.', '-');
-    return formattedDate
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
 function generateMovies(cardsCount) {
@@ -61,7 +59,6 @@ function generateMovies(cardsCount) {
 
         const releaseDate = generateDate(new Date(2000, 1, 1), new Date());
         const boxOffice = generateRandomNumber(0, 100000000);
-        const boxOfficeFormatted = new Intl.NumberFormat('ru-RU').format(boxOffice).replaceAll(' ', ',');
         const rating = generateRandomNumber(4, 9, false).toFixed(1);
 
         return {
@@ -70,7 +67,7 @@ function generateMovies(cardsCount) {
             poster: posters[cardIndex],
             director: directors[cardIndex],
             releaseDate,
-            boxOffice: `$${boxOfficeFormatted}`,
+            boxOffice,
             rating,
         }
     })
@@ -80,6 +77,8 @@ const data = generateMovies(titles.length);
 
 function render(movies) {
     const moviesContainer = document.querySelector('.film-list');
+    moviesContainer.innerHTML = '';
+
     const cardTemplate = document.getElementById('card-template').content;
 
     const cards = movies.map(function(movie) {
@@ -91,12 +90,24 @@ function render(movies) {
         const director = card.querySelector('.film-info__director .film-info__text');
         const boxOffice = card.querySelector('.film-info__box-office .film-info__text');
         const rating = card.querySelector('.film-info__rating .film-info__text');
+
+        const boxOfficeFormatted = (
+            movie.boxOffice &&
+            new Intl.NumberFormat('ru-RU').format(movie.boxOffice).replaceAll(' ', ',')
+        );
+
+        const formattedDate = (
+            movie.releaseDate &&
+            new Intl.DateTimeFormat('ru-RU').format(movie.releaseDate).replaceAll('.', '-')
+        );
+
+
         title.innerText = movie.title;
         plot.innerText = `${movie.plot.substring(0, 140)}...` || '-';
         poster.setAttribute('src', movie.poster);
-        releaseDate.innerText = movie.releaseDate || '-';
+        releaseDate.innerText = formattedDate || '-';
         director.innerText = movie.director || '-';
-        boxOffice.innerText = movie.boxOffice || '0';
+        boxOffice.innerText = `$${boxOfficeFormatted}` || '0';
         rating.innerText = movie.rating || '0';
 
         return card;
@@ -106,3 +117,25 @@ function render(movies) {
 }
 
 render(data);
+
+const sortingContainer = document.querySelector('.sorting');
+sortingContainer.addEventListener('click', function(event) {
+    const sortingButton = event.target.closest('.button');
+    if (!sortingButton) return;
+
+    if (sortingButton.classList.contains('button_checked')) {
+        sortingButton.classList.remove('button_checked');
+        render(data);
+    } else {
+        const buttons = sortingContainer.querySelectorAll('.button');
+        buttons.forEach((button) => button.classList.remove('button_checked'));
+        sortingButton.classList.add('button_checked');
+        const sortingParameter = sortingButton.id;
+        sortMovies(sortingParameter)
+    }
+});
+
+function sortMovies(sortingParameter) {
+    const sortedMovies = [...data].sort((a,b) => b[sortingParameter] - a[sortingParameter]);
+    render(sortedMovies)
+}
