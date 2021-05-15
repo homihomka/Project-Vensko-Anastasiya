@@ -76,7 +76,7 @@ function generateMovies(cardsCount) {
 
 const data = generateMovies(titles.length);
 
-const favoriteMovies = [];
+let favoriteMovies = [];
 
 const moviesContainer = document.querySelector('.film-list');
 
@@ -132,6 +132,11 @@ function getMovieCard(cardTemplate, movie) {
     return card;
 }
 
+const savedFavoriteMovies = localStorage.getItem('favoriteMovies');
+if (savedFavoriteMovies) {
+    favoriteMovies = JSON.parse(savedFavoriteMovies)
+}
+
 render(data);
 
 const sortingContainer = document.querySelector('.sorting');
@@ -182,13 +187,14 @@ moviesContainer.addEventListener('click', function (event) {
         favoriteButton.classList.remove('button_remove');
         favoriteButton.classList.add('button_add');
         const favoriteMovieIndex = favoriteMovies.indexOf(movieId);
-        favoriteMovies.splice(favoriteMovieIndex, 1)
+        favoriteMovies.splice(favoriteMovieIndex, 1);
     } else {
         favoriteButton.classList.remove('button_add');
         favoriteButton.classList.add('button_remove');
         favoriteMovies.push(movieId);
     }
 
+    localStorage.setItem('favoriteMovies', JSON.stringify(favoriteMovies));
     render(data)
 });
 
