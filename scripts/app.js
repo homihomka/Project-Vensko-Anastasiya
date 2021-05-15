@@ -139,3 +139,10 @@ function sortMovies(sortingParameter) {
     const sortedMovies = [...data].sort((a,b) => b[sortingParameter] - a[sortingParameter]);
     render(sortedMovies)
 }
+
+const searchField = document.querySelector('.search__input');
+searchField.addEventListener('input', function (event) {
+    const searchString = event.target.value.toLowerCase();
+    const searchResult = data.filter(movie => movie.title.toLowerCase().includes(searchString));
+    render(searchResult);
+});
