@@ -2,7 +2,9 @@ import { data } from './mocks.js';
 import { render } from './render.js';
 import { resetSearch } from './search.js';
 
-const sortingContainer = document.querySelector('.sorting');
+export const sortingContainer = document.querySelector('.sorting');
+
+export let activeSortingParameter = null;
 
 export function initSorting () {
     sortingContainer.addEventListener('click', function (event) {
@@ -11,14 +13,15 @@ export function initSorting () {
 
         resetSearch();
 
-        if (sortingButton.classList.contains('button_checked')) {
-            sortingButton.classList.remove('button_checked');
+        const selectedSorting = sortingButton.id;
+
+        if (activeSortingParameter === selectedSorting) {
+            resetSorting();
+
             render(data);
         } else {
-            resetSorting();
-            sortingButton.classList.add('button_checked');
-            const sortingParameter = sortingButton.id;
-            sortMovies(sortingParameter);
+            activeSortingParameter = selectedSorting;
+            sortMovies(selectedSorting);
         }
     })
 }
@@ -28,7 +31,6 @@ function sortMovies(sortingParameter) {
     render(sortedMovies);
 }
 
-export function resetSorting () {
-    const buttons = sortingContainer.querySelectorAll('.button');
-    buttons.forEach((button) => button.classList.remove('button_checked'));
+export function resetSorting() {
+    activeSortingParameter = null;
 }

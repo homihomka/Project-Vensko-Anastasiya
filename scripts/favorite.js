@@ -18,18 +18,12 @@ export function initFavorites() {
 
         const card = favoriteButton.closest('.card');
         const movieId = Number(card.dataset.id);
-        const isFavorite = favoriteButton.classList.contains('button_remove');
+        const isFavorite = favoriteMovies.includes(movieId);
 
         if (isFavorite) {
-            favoriteButton.classList.remove('button_remove');
-            favoriteButton.classList.add('button_add');
-
             const favoriteMovieIndex = favoriteMovies.indexOf(movieId);
             favoriteMovies.splice(favoriteMovieIndex, 1);
         } else {
-            favoriteButton.classList.remove('button_add');
-            favoriteButton.classList.add('button_remove');
-
             favoriteMovies.push(movieId);
         }
 

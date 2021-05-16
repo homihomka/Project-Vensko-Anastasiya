@@ -1,4 +1,5 @@
 import { favoriteMovies, isFavoriteChecked } from './favorite.js';
+import { activeSortingParameter, sortingContainer } from './sorting.js';
 
 function getMovieCard(cardTemplate, movie) {
     const isFavorite = favoriteMovies.includes(movie.id);
@@ -48,6 +49,14 @@ export function render(data) {
         !favoriteMovies.includes(movie.id))
     );
     const cards = movies.map(movie => getMovieCard(cardTemplate, movie));
+
+    const buttons = sortingContainer.querySelectorAll('.button');
+    buttons.forEach((button) => {
+        button.classList.remove('button_checked')
+        if (button.id === activeSortingParameter) {
+            button.classList.add('button_checked')
+        }
+    });
 
     moviesContainer.append(...cards)
 }
