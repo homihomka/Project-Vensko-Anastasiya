@@ -1,5 +1,5 @@
 import { moviesContainer, render } from './render.js';
-import { data } from './mocks.js';
+import { data } from './requests.js';
 import { resetSorting } from './sorting.js';
 import { resetSearch } from './search.js';
 
@@ -17,7 +17,7 @@ export function initFavorites() {
         if (!favoriteButton) return;
 
         const card = favoriteButton.closest('.card');
-        const movieId = Number(card.dataset.id);
+        const movieId = card.dataset.id;
         const isFavorite = favoriteMovies.includes(movieId);
 
         if (isFavorite) {

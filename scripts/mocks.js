@@ -53,19 +53,19 @@ function generateMockData(cardsCount) {
 
         generatedIndexes.push(cardIndex);
 
-        const releaseDate = generateRandomDate(new Date(2000, 1, 1), new Date());
-        const boxOffice = generateRandomNumber(0, 100000000);
-        const rating = generateRandomNumber(4, 9, false).toFixed(1);
+        const Released = generateRandomDate(new Date(2000, 1, 1), new Date());
+        const BoxOffice = generateRandomNumber(0, 100000000);
+        const Rating = generateRandomNumber(4, 9, false).toFixed(1);
 
         return {
-            id: index,
-            title: titles[cardIndex],
-            plot: plots[cardIndex],
-            poster: posters[cardIndex],
-            director: directors[cardIndex],
-            releaseDate,
-            boxOffice,
-            rating,
+            imdbID: index,
+            Title: titles[cardIndex],
+            Plot: plots[cardIndex],
+            Poster: posters[cardIndex],
+            Director: directors[cardIndex],
+            Released,
+            BoxOffice,
+            Rating,
         }
     })
 }
